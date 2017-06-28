@@ -1,13 +1,12 @@
 <?php
 /*
 Plugin Name: Mailster Google Analytics
-Version: 1.0
-Plugin URI: http://rxa.li/mailster?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster
-License: GPLv2
-Text Domain: 'mailster-google-analytics'
-Author: revaxarts.com
-Author URI: https://mailster.co
 Description: Integrates Google Analytics with Mailster Newsletter Plugin to track your clicks with the popular Analytics service
+Version: 1.0
+Author: EverPress
+Author URI: https://mailster.co
+Text Domain: mailster-dummy-mailer
+License: GPLv2 or later
  */
 
 
@@ -59,6 +58,7 @@ class MailsterGoogleAnalytics {
 		add_filter( 'mailster_redirect_to', array( &$this, 'redirect_to' ), 1, 2 );
 
 	}
+
 
 	/**
 	 * click_target function.
@@ -302,7 +302,7 @@ class MailsterGoogleAnalytics {
 	 * @return void
 	 */
 	public function notice() {
-		$msg = sprintf( __( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="http://rxa.li/mailster?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster">Mailster Newsletter Plugin</a>' );
+		$msg = sprintf( __( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster">Mailster Newsletter Plugin</a>' );
 	?>
 		<div class="error"><p><strong><?php	echo $msg; ?></strong></p></div>
 	<?php
