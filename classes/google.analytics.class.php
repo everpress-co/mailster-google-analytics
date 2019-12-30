@@ -234,7 +234,7 @@ class MailsterGoogleAnalytics {
 	 * @return void
 	 */
 	public function notice() {
-		$msg = sprintf( __( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster">Mailster Newsletter Plugin</a>' );
+		$msg = sprintf( esc_html__( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster&utm_medium=plugin">Mailster Newsletter Plugin</a>' );
 		?>
 		<div class="error"><p><strong><?php	echo $msg; ?></strong></p></div>
 		<?php
@@ -263,9 +263,9 @@ class MailsterGoogleAnalytics {
 		_gaq.push(['_setAccount', '<?php echo $ua; ?>']);
 		<?php
 		if ( $setDomainName ) {
-			echo "_gaq.push(['_setDomainName', '$setDomainName']);";}
+			echo "_gaq.push(['_setDomainName', '$setDomainName']);";
+		}
 		?>
-
 		_gaq.push(['_trackPageview']);
 		(function() {
 		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
@@ -290,7 +290,7 @@ class MailsterGoogleAnalytics {
 		if ( function_exists( 'mailster' ) ) {
 
 			if ( ! mailster_option( 'ga_id' ) ) {
-				mailster_notice( sprintf( __( 'Please enter your Web Property ID on the %s!', 'mailster-google-analytics' ), '<a href="edit.php?post_type=newsletter&page=mailster_settings&mailster_remove_notice=google_analytics#ga">Settings Page</a>' ), '', false, 'google_analytics' );
+				mailster_notice( sprintf( esc_html__( 'Please enter your Web Property ID on the %s!', 'mailster-google-analytics' ), '<a href="edit.php?post_type=newsletter&page=mailster_settings&mailster_remove_notice=google_analytics#ga">Settings Page</a>' ), '', false, 'google_analytics' );
 			}
 		}
 
