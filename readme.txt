@@ -2,7 +2,7 @@
 Contributors: everpress
 Tags: mailster, analytics, google, google analytics tracking
 Requires at least: 3.8
-Tested up to: 5.5
+Tested up to: 5.8
 Stable tag: 1.2
 License: GPLv2 or later
 Author: EverPress
