@@ -14,16 +14,10 @@ class MailsterGoogleAnalytics {
 
 		load_plugin_textdomain( 'mailster-google-analytics' );
 
-		add_action( 'init', array( &$this, 'init' ), 1 );
+		add_action( 'plugins_loaded', array( &$this, 'init' ), 1 );
 	}
 
 
-	/**
-	 * init function.
-	 *
-	 * @access public
-	 * @return void
-	 */
 	public function init() {
 
 		if ( ! function_exists( 'mailster' ) ) {
@@ -36,44 +30,73 @@ class MailsterGoogleAnalytics {
 		if ( is_admin() ) {
 
 			add_action( 'add_meta_boxes', array( &$this, 'add_meta_boxes' ) );
-
 			add_filter( 'mailster_setting_sections', array( &$this, 'settings_tab' ), 1 );
-
 			add_action( 'mailster_section_tab_ga', array( &$this, 'settings' ) );
-
 			add_action( 'save_post', array( &$this, 'save_post' ), 10, 2 );
+
 		}
 
 		add_action( 'mailster_wpfooter', array( &$this, 'wpfooter' ) );
-		add_filter( 'mailster_redirect_to', array( &$this, 'redirect_to' ), 1, 2 );
+		add_filter( 'mailster_redirect_to', array( &$this, 'redirect_to' ), 1, 3 );
+		add_filter( 'mailster_campaign_content', array( &$this, 'append_utm' ), 1, 3 );
 
 	}
 
 
-	/**
-	 * click_target function.
-	 *
-	 * @access public
-	 * @param mixed $target
-	 * @return void
-	 */
-	public function redirect_to( $target, $campaign_id ) {
+	public function append_utm( $content, $campaign, $subscriber ) {
 
-		if ( ! mailster_option( 'ga_external_domains' ) ) {
-			$target_domain = parse_url( $target, PHP_URL_HOST );
-			$site_domain   = parse_url( site_url(), PHP_URL_HOST );
+		$campaign_id   = $campaign ? $campaign->ID : false;
+		$subscriber_id = $subscriber ? $subscriber->ID : false;
 
-			if ( $target_domain !== $site_domain ) {
-				return $target;
+		// do not append when tracking is enabled
+		if ( mailster( 'campaigns' )->meta( $campaign_id, 'track_clicks' ) ) {
+			return $content;
+		}
+		// get all links from the basecontent
+		if ( preg_match_all( '# href=(\'|")?(https?[^\'"]+)(\'|")?#', $content, $links ) ) {
+
+			$links = $links[2];
+
+			if ( empty( $links ) ) {
+				return $content;
+			}
+
+			foreach ( $links as $link ) {
+				$content = str_replace( 'href="' . $link . '"', 'href="' . $this->map_utm( $link, $campaign_id, $subscriber_id ) . '"', $content );
 			}
 		}
 
-		$subscriber = mailster( 'subscribers' )->get_by_hash( $hash );
+		return $content;
+
+	}
+
+
+	public function redirect_to( $target, $campaign_id, $subscriber_id ) {
+
+		return $this->map_utm( $target, $campaign_id, $subscriber_id );
+
+	}
+
+
+	private function map_utm( $link, $campaign_id, $subscriber_id ) {
+
+		if ( ! mailster_option( 'ga_external_domains' ) ) {
+			$link_domain = parse_url( $link, PHP_URL_HOST );
+			$site_domain = parse_url( site_url(), PHP_URL_HOST );
+
+			if ( $link_domain !== $site_domain ) {
+				return $link;
+			}
+		}
+
+		$subscriber = mailster( 'subscribers' )->get( $subscriber_id );
 		$campaign   = mailster( 'campaigns' )->get( $campaign_id );
 
 		if ( ! $campaign || $campaign->post_type != 'newsletter' ) {
-			return $target;
+			return $link;
 		}
+
+		$link = str_replace( '&amp;', '&', $link );
 
 		$hash  = get_query_var( '_mailster_hash', ( isset( $_REQUEST['k'] ) ? preg_replace( '/\s+/', '', $_REQUEST['k'] ) : null ) );
 		$count = get_query_var( '_mailster_extra', ( isset( $_REQUEST['c'] ) ? intval( $_REQUEST['c'] ) : null ) );
@@ -84,25 +107,16 @@ class MailsterGoogleAnalytics {
 			$campaign->post_title,
 			$campaign->post_status == 'autoresponder' ? 'autoresponder' : 'regular',
 			get_permalink( $campaign->ID ),
-			$subscriber->ID,
-			$subscriber->email,
-			$subscriber->hash,
-			$target,
+			$subscriber ? $subscriber->ID : '',
+			$subscriber ? $subscriber->email : '',
+			$subscriber ? $subscriber->hash : '',
+			$link,
 		);
 
-		$values = wp_parse_args(
-			get_post_meta( $campaign->ID, 'mailster-ga', true ),
-			mailster_option(
-				'ga',
-				array(
-					'utm_source'   => 'newsletter',
-					'utm_medium'   => 'email',
-					'utm_term'     => '%%LINK%%',
-					'utm_content'  => '',
-					'utm_campaign' => '%%CAMP_TITLE%%',
-				)
-			)
-		);
+		$values = wp_parse_args( get_post_meta( $campaign->ID, 'mailster-ga', true ), mailster_option( 'ga' ) );
+
+		parse_str( parse_url( $link, PHP_URL_QUERY ), $link_query );
+		$values = wp_parse_args( $link_query, $values );
 
 		return add_query_arg(
 			array(
@@ -112,20 +126,11 @@ class MailsterGoogleAnalytics {
 				'utm_content'  => urlencode( str_replace( $search, $replace, $values['utm_content'] ) ),
 				'utm_campaign' => urlencode( str_replace( $search, $replace, $values['utm_campaign'] ) ),
 			),
-			$target
+			$link
 		);
 	}
 
 
-
-	/**
-	 * save_post function.
-	 *
-	 * @access public
-	 * @param mixed $post_id
-	 * @param mixed $post
-	 * @return void
-	 */
 	public function save_post( $post_id, $post ) {
 
 		if ( isset( $_POST['mailster_ga'] ) && $post->post_type == 'newsletter' ) {
@@ -151,13 +156,6 @@ class MailsterGoogleAnalytics {
 	}
 
 
-	/**
-	 * settings_tab function.
-	 *
-	 * @access public
-	 * @param mixed $settings
-	 * @return void
-	 */
 	public function settings_tab( $settings ) {
 
 		$position = 11;
@@ -169,12 +167,6 @@ class MailsterGoogleAnalytics {
 	}
 
 
-	/**
-	 * add_meta_boxes function.
-	 *
-	 * @access public
-	 * @return void
-	 */
 	public function add_meta_boxes() {
 
 		if ( mailster_option( 'ga_campaign_based' ) ) {
@@ -183,31 +175,13 @@ class MailsterGoogleAnalytics {
 	}
 
 
-	/**
-	 * metabox function.
-	 *
-	 * @access public
-	 * @return void
-	 */
 	public function metabox() {
 
 		global $post;
 
 		$readonly = ( in_array( $post->post_status, array( 'finished', 'active' ) ) || $post->post_status == 'autoresponder' && ! empty( $_GET['showstats'] ) ) ? 'readonly disabled' : '';
 
-		$values = wp_parse_args(
-			get_post_meta( $post->ID, 'mailster-ga', true ),
-			mailster_option(
-				'ga',
-				array(
-					'utm_source'   => 'newslettera',
-					'utm_medium'   => 'email',
-					'utm_term'     => '%%LINK%%',
-					'utm_content'  => '',
-					'utm_campaign' => '%%CAMP_TITLE%%',
-				)
-			)
-		);
+		$values = wp_parse_args( get_post_meta( $post->ID, 'mailster-ga', true ), mailster_option( 'ga' ) );
 
 		?>
 		<style>#mailster_ga {display: inherit;}</style>
@@ -226,13 +200,6 @@ class MailsterGoogleAnalytics {
 	}
 
 
-
-	/**
-	 * notice function.
-	 *
-	 * @access public
-	 * @return void
-	 */
 	public function notice() {
 		$msg = sprintf( esc_html__( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster&utm_medium=plugin">Mailster Newsletter Plugin</a>' );
 		?>
@@ -242,12 +209,6 @@ class MailsterGoogleAnalytics {
 	}
 
 
-	/**
-	 * wpfooter function.
-	 *
-	 * @access public
-	 * @return void
-	 */
 	public function wpfooter() {
 
 		$ua            = mailster_option( 'ga_id' );
@@ -261,11 +222,7 @@ class MailsterGoogleAnalytics {
 	<script type="text/javascript">
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', '<?php echo $ua; ?>']);
-		<?php
-		if ( $setDomainName ) {
-			echo "_gaq.push(['_setDomainName', '$setDomainName']);";
-		}
-		?>
+		<?php echo $setDomainName ? "_gaq.push(['_setDomainName', '$setDomainName']);" : ''; ?>
 		_gaq.push(['_trackPageview']);
 		(function() {
 		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
@@ -277,20 +234,31 @@ class MailsterGoogleAnalytics {
 
 	}
 
-	/**
-	 * activate function.
-	 *
-	 * activate function
-	 *
-	 * @access public
-	 * @return void
-	 */
 	public function activate() {
 
 		if ( function_exists( 'mailster' ) ) {
 
 			if ( ! mailster_option( 'ga_id' ) ) {
 				mailster_notice( sprintf( esc_html__( 'Please enter your Web Property ID on the %s!', 'mailster-google-analytics' ), '<a href="edit.php?post_type=newsletter&page=mailster_settings&mailster_remove_notice=google_analytics#ga">Settings Page</a>' ), '', false, 'google_analytics' );
+			}
+
+			$defaults = array(
+				'ga'                  => array(
+					'utm_source'   => 'newsletter',
+					'utm_medium'   => 'email',
+					'utm_term'     => '%%LINK%%',
+					'utm_content'  => '',
+					'utm_campaign' => '%%CAMP_TITLE%%',
+				),
+				'ga_external_domains' => true,
+			);
+
+			$mailster_options = mailster_options();
+
+			foreach ( $defaults as $key => $value ) {
+				if ( ! isset( $mailster_options[ $key ] ) ) {
+					mailster_update_option( $key, $value );
+				}
 			}
 		}
 

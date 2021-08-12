@@ -2,7 +2,6 @@
 	jQuery(document).ready(function ($) {
 
 		var inputs = $('.mailster-ga-value');
-
 		inputs.on('keyup change', function(){
 			var pairs = [];
 			$.each(inputs, function(){
@@ -12,9 +11,7 @@
 			});
 			$('#mailster-ga-preview').html('?'+pairs.join('&'));
 
-		}).trigger('keyup');
-
-
+		}).trigger('change');
 	});
 </script>
 <table class="form-table">
@@ -38,18 +35,7 @@
 	<tr valign="top">
 		<th scope="row"><?php esc_html_e( 'Defaults', 'mailster-google-analytics' ); ?><p class="description"><?php esc_html_e( 'Define the defaults for click tracking. Keep the default values until you know better.', 'mailster-google-analytics' ); ?></p></th>
 		<td>
-		<?php
-		$ga_values = mailster_option(
-			'ga',
-			array(
-				'utm_source'   => 'newsletter',
-				'utm_medium'   => 'email',
-				'utm_term'     => '%%LINK%%',
-				'utm_content'  => '',
-				'utm_campaign' => '%%CAMP_TITLE%%',
-			)
-		);
-		?>
+		<?php $ga_values = mailster_option( 'ga' ); ?>
 		<div class="mailster_text"><label><?php esc_html_e( 'Campaign Source', 'mailster-google-analytics' ); ?> *:</label> <input type="text" name="mailster_options[ga][utm_source]" value="<?php echo esc_attr( $ga_values['utm_source'] ); ?>" class="mailster-ga-value regular-text"></div>
 		<div class="mailster_text"><label><?php esc_html_e( 'Campaign Medium', 'mailster-google-analytics' ); ?> *:</label> <input type="text" name="mailster_options[ga][utm_medium]" value="<?php echo esc_attr( $ga_values['utm_medium'] ); ?>" class="mailster-ga-value regular-text"></div>
 		<div class="mailster_text"><label><?php esc_html_e( 'Campaign Term', 'mailster-google-analytics' ); ?>:</label> <input type="text" name="mailster_options[ga][utm_term]" value="<?php echo esc_attr( $ga_values['utm_term'] ); ?>" class="mailster-ga-value regular-text"></div>

@@ -3,7 +3,7 @@ Contributors: everpress
 Tags: mailster, analytics, google, google analytics tracking
 Requires at least: 3.8
 Tested up to: 5.8
-Stable tag: 1.2
+Stable tag: 1.3
 License: GPLv2 or later
 Author: EverPress
 Author URI: https://mailster.co
@@ -26,6 +26,11 @@ Requires the Mailster Newsletter plugin and the Google Analytics tracking code o
 You need the [Mailster Newsletter Plugin for WordPress](https://mailster.co/?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster&utm_medium=readme)
 
 == Changelog ==
+
+= 1.3 =
+
+* improved handling of adding utm_* query args
+* now works if tracking is disabled.
 
 = 1.2 =
 
