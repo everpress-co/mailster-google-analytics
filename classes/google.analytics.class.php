@@ -37,8 +37,8 @@ class MailsterGoogleAnalytics {
 		}
 
 		add_action( 'mailster_wpfooter', array( &$this, 'wpfooter' ) );
-		add_filter( 'mailster_redirect_to', array( &$this, 'redirect_to' ), 1, 3 );
-		add_filter( 'mailster_campaign_content', array( &$this, 'append_utm' ), 1, 3 );
+		add_filter( 'mailster_redirect_to', array( &$this, 'redirect_to' ), 999, 3 );
+		add_filter( 'mailster_campaign_content', array( &$this, 'append_utm' ), 999, 3 );
 
 	}
 
@@ -52,7 +52,7 @@ class MailsterGoogleAnalytics {
 		if ( mailster( 'campaigns' )->meta( $campaign_id, 'track_clicks' ) ) {
 			return $content;
 		}
-		// get all links from the basecontent
+		// get all links from the base content
 		if ( preg_match_all( '# href=(\'|")?(https?[^\'"]+)(\'|")?#', $content, $links ) ) {
 
 			$links = $links[2];
@@ -118,7 +118,7 @@ class MailsterGoogleAnalytics {
 		parse_str( parse_url( $link, PHP_URL_QUERY ), $link_query );
 		$values = wp_parse_args( $link_query, $values );
 
-		return add_query_arg(
+		$link = add_query_arg(
 			array(
 				'utm_source'   => urlencode( str_replace( $search, $replace, $values['utm_source'] ) ),
 				'utm_medium'   => urlencode( str_replace( $search, $replace, $values['utm_medium'] ) ),
@@ -128,6 +128,8 @@ class MailsterGoogleAnalytics {
 			),
 			$link
 		);
+
+		return $link;
 	}
 
 
@@ -137,16 +139,7 @@ class MailsterGoogleAnalytics {
 
 			$save = get_post_meta( $post_id, 'mailster-ga', true );
 
-			$ga_values = mailster_option(
-				'ga',
-				array(
-					'utm_source'   => 'newsletter',
-					'utm_medium'   => 'email',
-					'utm_term'     => '%%LINK%%',
-					'utm_content'  => '',
-					'utm_campaign' => '%%CAMP_TITLE%%',
-				)
-			);
+			$ga_values = mailster_option( 'ga' );
 
 			$save = wp_parse_args( $_POST['mailster_ga'], $save );
 			update_post_meta( $post_id, 'mailster-ga', $save );
