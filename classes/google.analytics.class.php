@@ -118,16 +118,15 @@ class MailsterGoogleAnalytics {
 		parse_str( parse_url( $link, PHP_URL_QUERY ), $link_query );
 		$values = wp_parse_args( $link_query, $values );
 
-		$link = add_query_arg(
-			array(
-				'utm_source'   => urlencode( str_replace( $search, $replace, $values['utm_source'] ) ),
-				'utm_medium'   => urlencode( str_replace( $search, $replace, $values['utm_medium'] ) ),
-				'utm_term'     => urlencode( str_replace( $search, $replace, $values['utm_term'] ) ),
-				'utm_content'  => urlencode( str_replace( $search, $replace, $values['utm_content'] ) ),
-				'utm_campaign' => urlencode( str_replace( $search, $replace, $values['utm_campaign'] ) ),
-			),
-			$link
+		$utms = array(
+			'utm_source'   => rawurldecode( str_replace( $search, $replace, $values['utm_source'] ) ),
+			'utm_medium'   => rawurldecode( str_replace( $search, $replace, $values['utm_medium'] ) ),
+			'utm_term'     => rawurldecode( str_replace( $search, $replace, $values['utm_term'] ) ),
+			'utm_content'  => rawurldecode( str_replace( $search, $replace, $values['utm_content'] ) ),
+			'utm_campaign' => rawurldecode( str_replace( $search, $replace, $values['utm_campaign'] ) ),
 		);
+
+		$link = add_query_arg( $utms, $link );
 
 		return $link;
 	}
