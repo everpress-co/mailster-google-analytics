@@ -1,12 +1,12 @@
 # Mailster Google Analytics
 
-Contributors: everpress \
-Tags: mailster, analytics, google, google analytics tracking \
-Requires at least: 3.8 \
-Tested up to: 5.9 \
-Stable tag: 1.3.1 \
-License: GPLv2 or later \
-Requires PHP: 5.3.6 \
+Contributors: everpress  
+Tags: mailster, analytics, google, google analytics tracking  
+Requires at least: 3.8  
+Tested up to: 5.9  
+Stable tag: 1.3.1  
+License: GPLv2 or later  
+Requires PHP: 5.3.6  
 
 ## Description
 
@@ -30,7 +30,7 @@ You need the [Mailster Newsletter Plugin for WordPress](https://mailster.co/?utm
 
 ### 1.3.1
 
--   lowered priority of the filter so adding the utm\_\* args happend at the end.
+- lowered priority of the filter so adding the utm\_\* args happend at the end.
 
 ### 1.3
 
@@ -48,3 +48,6 @@ You need the [Mailster Newsletter Plugin for WordPress](https://mailster.co/?utm
 ### 1.0
 
 -   initial release
+
+
+
