@@ -1,6 +1,7 @@
 <?php
 /*
 Plugin Name: Mailster Google Analytics
+Plugin URI: https://mailster.co/?utm_campaign=wporg&utm_source=wordpress.org&utm_medium=plugin&utm_term=Google+Analytics
 Description: Integrates Google Analytics with Mailster Newsletter Plugin to track your clicks with the popular Analytics service
 Version: 1.3.1
 Author: EverPress

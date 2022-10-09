@@ -193,7 +193,7 @@ class MailsterGoogleAnalytics {
 
 
 	public function notice() {
-		$msg = sprintf( esc_html__( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster&utm_medium=plugin">Mailster Newsletter Plugin</a>' );
+		$msg = sprintf( esc_html__( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=wordpress.org&utm_medium=plugin&utm_term=Google+Analytics+for+Mailster">Mailster Newsletter Plugin</a>' );
 		?>
 		<div class="error"><p><strong><?php	echo $msg; ?></strong></p></div>
 		<?php
