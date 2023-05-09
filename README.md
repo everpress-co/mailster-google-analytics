@@ -3,10 +3,10 @@
 Contributors: everpress, xaverb  
 Tags: mailster, analytics, google, google analytics tracking  
 Requires at least: 3.8  
-Tested up to: 6.0  
-Stable tag: 1.3.1  
+Tested up to: 6.2  
+Stable tag: 1.4.0  
 License: GPLv2 or later  
-Requires PHP: 5.3.6
+Requires PHP: 7.2.5
 
 ## Description
 
@@ -28,23 +28,27 @@ You need the [Mailster Newsletter Plugin for WordPress](https://mailster.co/?utm
 
 ## Changelog
 
+### 1.4.0
+
+- added: support for GA4
+
 ### 1.3.1
 
--   lowered priority of the filter so adding the utm\_\* args happend at the end.
+- lowered priority of the filter so adding the utm\_\* args happend at the end.
 
 ### 1.3
 
--   improved handling of adding utm\_\* query args
--   now works if tracking is disabled.
+- improved handling of adding utm\_\* query args
+- now works if tracking is disabled.
 
 ### 1.2
 
--   added: option to allow tracking external domain
+- added: option to allow tracking external domain
 
 ### 1.1
 
--   updated file structure
+- updated file structure
 
 ### 1.0
 
--   initial release
+- initial release
