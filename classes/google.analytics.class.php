@@ -48,10 +48,13 @@ class MailsterGoogleAnalytics {
 		$campaign_id   = $campaign ? $campaign->ID : false;
 		$subscriber_id = $subscriber ? $subscriber->ID : false;
 
-		// do not append when tracking is enabled
-		if ( mailster( 'campaigns' )->meta( $campaign_id, 'track_clicks' ) ) {
+		$meta = mailster( 'campaigns' )->meta( $campaign_id );
+
+		// do not append when tracking is enabled (or meta is not set yet)
+		if ( ! $meta || ! $meta['track_clicks'] ) {
 			return $content;
 		}
+
 		// get all links from the base content
 		if ( preg_match_all( '# href=(\'|")?(https?[^\'"]+)(\'|")?#', $content, $links ) ) {
 
@@ -98,9 +101,6 @@ class MailsterGoogleAnalytics {
 
 		$link = str_replace( '&amp;', '&', $link );
 
-		$hash  = get_query_var( '_mailster_hash', ( isset( $_REQUEST['k'] ) ? preg_replace( '/\s+/', '', $_REQUEST['k'] ) : null ) );
-		$count = get_query_var( '_mailster_extra', ( isset( $_REQUEST['c'] ) ? intval( $_REQUEST['c'] ) : null ) );
-
 		$search  = array( '%%CAMP_ID%%', '%%CAMP_TITLE%%', '%%CAMP_TYPE%%', '%%CAMP_LINK%%', '%%SUBSCRIBER_ID%%', '%%SUBSCRIBER_EMAIL%%', '%%SUBSCRIBER_HASH%%', '%%LINK%%' );
 		$replace = array(
 			$campaign->ID,
@@ -126,9 +126,7 @@ class MailsterGoogleAnalytics {
 			'utm_campaign' => rawurldecode( str_replace( $search, $replace, $values['utm_campaign'] ) ),
 		);
 
-		$link = add_query_arg( $utms, $link );
-
-		return $link;
+		return add_query_arg( $utms, $link );
 	}
 
 
@@ -193,7 +191,7 @@ class MailsterGoogleAnalytics {
 
 
 	public function notice() {
-		$msg = sprintf( esc_html__( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=Google+Analytics+for+Mailster&utm_medium=plugin">Mailster Newsletter Plugin</a>' );
+		$msg = sprintf( esc_html__( 'You have to enable the %s to use the Google Analytics Extension!', 'mailster-google-analytics' ), '<a href="https://mailster.co/?utm_campaign=wporg&utm_source=wordpress.org&utm_medium=plugin&utm_term=Google+Analytics+for+Mailster">Mailster Newsletter Plugin</a>' );
 		?>
 		<div class="error"><p><strong><?php	echo $msg; ?></strong></p></div>
 		<?php
@@ -204,24 +202,43 @@ class MailsterGoogleAnalytics {
 	public function wpfooter() {
 
 		$ua            = mailster_option( 'ga_id' );
+		$gtag          = mailster_option( 'ga_gtag' );
 		$setDomainName = mailster_option( 'ga_setdomainname' );
 
-		if ( ! $ua ) {
-			return;
-		}
-		?>
+		if ( $ua ) :
+			?>
+		<!-- Added by Google Analytics add on for Mailster (gtag.js) -->
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', '<?php echo esc_html( $ua ); ?>']);
+			<?php echo $setDomainName ? "_gaq.push(['_setDomainName', '$setDomainName']);" : ''; ?>
+			_gaq.push(['_trackPageview']);
+			(function() {
+			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+		</script>
 
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', '<?php echo $ua; ?>']);
-		<?php echo $setDomainName ? "_gaq.push(['_setDomainName', '$setDomainName']);" : ''; ?>
-		_gaq.push(['_trackPageview']);
-		(function() {
-		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
-	</script>
+		<?php endif; ?>
+		<?php if ( $gtag ) : ?>
+
+		<!-- Added by Google Analytics add on for Mailster (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_html( $gtag ); ?>"></script>
+		<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+			<?php if ( $setDomainName ) : ?>
+		gtag('config', '<?php echo esc_html( $gtag ); ?>', {'cookie_domain': '<?php echo esc_html( $setDomainName ); ?>'});
+		<?php else : ?>
+		gtag('config', '<?php echo esc_html( $gtag ); ?>');
+		<?php endif; ?>		
+		
+		</script>
+		<?php endif; ?>
+
 		<?php
 
 	}

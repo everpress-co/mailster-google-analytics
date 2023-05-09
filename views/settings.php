@@ -15,8 +15,15 @@
 	});
 </script>
 <table class="form-table">
+<tr valign="top">
+		<th scope="row"><?php esc_html_e( 'G-Tag ID:', 'mailster-google-analytics' ); ?></th>
+		<td>
+		<p class="description"><input type="text" name="mailster_options[ga_gtag]" value="<?php echo esc_attr( mailster_option( 'ga_gtag' ) ); ?>" class="regular-text" placeholder="G-XXXXXXXXXX">
+		<?php esc_html_e( 'for the front end page of each newsletter', 'mailster-google-analytics' ); ?></p>
+		</td>
+	</tr>
 	<tr valign="top">
-		<th scope="row"><?php esc_html_e( 'Web Property ID:', 'mailster-google-analytics' ); ?></th>
+		<th scope="row"><?php esc_html_e( 'Web Property ID: (Legacy)', 'mailster-google-analytics' ); ?></th>
 		<td>
 		<p class="description"><input type="text" name="mailster_options[ga_id]" value="<?php echo esc_attr( mailster_option( 'ga_id' ) ); ?>" class="regular-text" placeholder="UA-XXXXXXX-X">
 		<?php esc_html_e( 'for the front end page of each newsletter', 'mailster-google-analytics' ); ?></p>
