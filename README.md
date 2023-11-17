@@ -3,7 +3,7 @@
 Contributors: everpress, xaverb  
 Tags: mailster, analytics, google, google analytics tracking  
 Requires at least: 3.8  
-Tested up to: 6.2  
+Tested up to: 6.4  
 Stable tag: 1.4.0  
 License: GPLv2 or later  
 Requires PHP: 7.2.5
