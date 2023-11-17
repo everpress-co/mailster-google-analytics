@@ -39,7 +39,6 @@ class MailsterGoogleAnalytics {
 		add_action( 'mailster_wpfooter', array( &$this, 'wpfooter' ) );
 		add_filter( 'mailster_redirect_to', array( &$this, 'redirect_to' ), 999, 3 );
 		add_filter( 'mailster_campaign_content', array( &$this, 'append_utm' ), 999, 3 );
-
 	}
 
 
@@ -50,8 +49,13 @@ class MailsterGoogleAnalytics {
 
 		$meta = mailster( 'campaigns' )->meta( $campaign_id );
 
-		// do not append when tracking is enabled (or meta is not set yet)
-		if ( ! $meta || ! $meta['track_clicks'] ) {
+		// do not append when tracking meta is not set yet
+		if ( ! $meta ) {
+			return $content;
+		}
+
+		// if tracking is enabled, utms will be added after the click
+		if ( $meta['track_clicks'] ) {
 			return $content;
 		}
 
@@ -70,22 +74,20 @@ class MailsterGoogleAnalytics {
 		}
 
 		return $content;
-
 	}
 
 
 	public function redirect_to( $target, $campaign_id, $subscriber_id ) {
 
 		return $this->map_utm( $target, $campaign_id, $subscriber_id );
-
 	}
 
 
 	private function map_utm( $link, $campaign_id, $subscriber_id ) {
 
 		if ( ! mailster_option( 'ga_external_domains' ) ) {
-			$link_domain = parse_url( $link, PHP_URL_HOST );
-			$site_domain = parse_url( site_url(), PHP_URL_HOST );
+			$link_domain = wp_parse_url( $link, PHP_URL_HOST );
+			$site_domain = wp_parse_url( site_url(), PHP_URL_HOST );
 
 			if ( $link_domain !== $site_domain ) {
 				return $link;
@@ -115,15 +117,15 @@ class MailsterGoogleAnalytics {
 
 		$values = wp_parse_args( get_post_meta( $campaign->ID, 'mailster-ga', true ), mailster_option( 'ga' ) );
 
-		parse_str( parse_url( $link, PHP_URL_QUERY ), $link_query );
+		wp_parse_str( parse_url( $link, PHP_URL_QUERY ), $link_query );
 		$values = wp_parse_args( $link_query, $values );
 
 		$utms = array(
-			'utm_source'   => rawurldecode( str_replace( $search, $replace, $values['utm_source'] ) ),
-			'utm_medium'   => rawurldecode( str_replace( $search, $replace, $values['utm_medium'] ) ),
-			'utm_term'     => rawurldecode( str_replace( $search, $replace, $values['utm_term'] ) ),
-			'utm_content'  => rawurldecode( str_replace( $search, $replace, $values['utm_content'] ) ),
-			'utm_campaign' => rawurldecode( str_replace( $search, $replace, $values['utm_campaign'] ) ),
+			'utm_source'   => rawurlencode( str_replace( $search, $replace, $values['utm_source'] ) ),
+			'utm_medium'   => rawurlencode( str_replace( $search, $replace, $values['utm_medium'] ) ),
+			'utm_term'     => rawurlencode( str_replace( $search, $replace, $values['utm_term'] ) ),
+			'utm_content'  => rawurlencode( str_replace( $search, $replace, $values['utm_content'] ) ),
+			'utm_campaign' => rawurlencode( str_replace( $search, $replace, $values['utm_campaign'] ) ),
 		);
 
 		return add_query_arg( $utms, $link );
@@ -136,13 +138,10 @@ class MailsterGoogleAnalytics {
 
 			$save = get_post_meta( $post_id, 'mailster-ga', true );
 
-			$ga_values = mailster_option( 'ga' );
-
 			$save = wp_parse_args( $_POST['mailster_ga'], $save );
 			update_post_meta( $post_id, 'mailster-ga', $save );
 
 		}
-
 	}
 
 
@@ -174,7 +173,6 @@ class MailsterGoogleAnalytics {
 		$values = wp_parse_args( get_post_meta( $post->ID, 'mailster-ga', true ), mailster_option( 'ga' ) );
 
 		?>
-		<style>#mailster_ga {display: inherit;}</style>
 		<p><label><?php esc_html_e( 'Campaign Source', 'mailster-google-analytics' ); ?>*:<input type="text" name="mailster_ga[utm_source]" value="<?php echo esc_attr( $values['utm_source'] ); ?>" class="widefat" <?php echo $readonly; ?>></label></p>
 		<p><label><?php esc_html_e( 'Campaign Medium', 'mailster-google-analytics' ); ?>*:<input type="text" name="mailster_ga[utm_medium]" value="<?php echo esc_attr( $values['utm_medium'] ); ?>" class="widefat" <?php echo $readonly; ?>></label></p>
 		<p><label><?php esc_html_e( 'Campaign Term', 'mailster-google-analytics' ); ?>:<input type="text" name="mailster_ga[utm_term]" value="<?php echo esc_attr( $values['utm_term'] ); ?>" class="widefat" <?php echo $readonly; ?>></label></p>
@@ -186,7 +184,6 @@ class MailsterGoogleAnalytics {
 	public function settings() {
 
 		include $this->plugin_path . '/views/settings.php';
-
 	}
 
 
@@ -195,7 +192,6 @@ class MailsterGoogleAnalytics {
 		?>
 		<div class="error"><p><strong><?php	echo $msg; ?></strong></p></div>
 		<?php
-
 	}
 
 
@@ -210,7 +206,7 @@ class MailsterGoogleAnalytics {
 		<!-- Added by Google Analytics add on for Mailster (gtag.js) -->
 		<script type="text/javascript">
 			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', '<?php echo esc_html( $ua ); ?>']);
+			_gaq.push(['_setAccount', '<?php esc_html_e( $ua ); ?>']);
 			<?php echo $setDomainName ? "_gaq.push(['_setDomainName', '$setDomainName']);" : ''; ?>
 			_gaq.push(['_trackPageview']);
 			(function() {
@@ -224,54 +220,51 @@ class MailsterGoogleAnalytics {
 		<?php if ( $gtag ) : ?>
 
 		<!-- Added by Google Analytics add on for Mailster (gtag.js) -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_html( $gtag ); ?>"></script>
+		<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo esc_attr( $gtag ); ?>"></script>
 		<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag(){dataLayer.push(arguments);}
 		gtag('js', new Date());
 
 			<?php if ( $setDomainName ) : ?>
-		gtag('config', '<?php echo esc_html( $gtag ); ?>', {'cookie_domain': '<?php echo esc_html( $setDomainName ); ?>'});
+		gtag('config', '<?php esc_html_e( $gtag ); ?>', {'cookie_domain': '<?php esc_html_e( $setDomainName ); ?>'});
 		<?php else : ?>
-		gtag('config', '<?php echo esc_html( $gtag ); ?>');
+		gtag('config', '<?php esc_html_e( $gtag ); ?>');
 		<?php endif; ?>		
 		
 		</script>
 		<?php endif; ?>
 
 		<?php
-
 	}
 
 	public function activate() {
 
-		if ( function_exists( 'mailster' ) ) {
-
-			if ( ! mailster_option( 'ga_id' ) ) {
-				mailster_notice( sprintf( esc_html__( 'Please enter your Web Property ID on the %s!', 'mailster-google-analytics' ), '<a href="edit.php?post_type=newsletter&page=mailster_settings&mailster_remove_notice=google_analytics#ga">Settings Page</a>' ), '', false, 'google_analytics' );
-			}
-
-			$defaults = array(
-				'ga'                  => array(
-					'utm_source'   => 'newsletter',
-					'utm_medium'   => 'email',
-					'utm_term'     => '%%LINK%%',
-					'utm_content'  => '',
-					'utm_campaign' => '%%CAMP_TITLE%%',
-				),
-				'ga_external_domains' => true,
-			);
-
-			$mailster_options = mailster_options();
-
-			foreach ( $defaults as $key => $value ) {
-				if ( ! isset( $mailster_options[ $key ] ) ) {
-					mailster_update_option( $key, $value );
-				}
-			}
+		if ( ! function_exists( 'mailster' ) ) {
+			return;
 		}
 
+		if ( ! mailster_option( 'ga_id' ) ) {
+			mailster_notice( sprintf( esc_html__( 'Please enter your Web Property ID on the %s!', 'mailster-google-analytics' ), '<a href="edit.php?post_type=newsletter&page=mailster_settings&mailster_remove_notice=google_analytics#ga">Settings Page</a>' ), '', false, 'google_analytics' );
+		}
+
+		$defaults = array(
+			'ga'                  => array(
+				'utm_source'   => 'newsletter',
+				'utm_medium'   => 'email',
+				'utm_term'     => '%%LINK%%',
+				'utm_content'  => '',
+				'utm_campaign' => '%%CAMP_TITLE%%',
+			),
+			'ga_external_domains' => true,
+		);
+
+		$mailster_options = mailster_options();
+
+		foreach ( $defaults as $key => $value ) {
+			if ( ! isset( $mailster_options[ $key ] ) ) {
+				mailster_update_option( $key, $value );
+			}
+		}
 	}
-
-
 }

@@ -28,6 +28,12 @@ You need the [Mailster Newsletter Plugin for WordPress](https://mailster.co/?utm
 
 ## Changelog
 
+### 1.5.0
+
+- fixed: utm arguments are now urlencoded
+- fixed: do not append if tracking is enabled (will be added on click)
+- fixed: warnings on PHP 8.2
+
 ### 1.4.0
 
 - added: support for GA4
