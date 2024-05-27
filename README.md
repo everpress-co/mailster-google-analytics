@@ -1,9 +1,9 @@
 # Mailster Google Analytics
 
-Contributors: everpress, xaverb  
+Contributors: everpress, mailster, xaverb  
 Tags: mailster, analytics, google, google analytics tracking  
-Requires at least: 4.6  
-Tested up to: 6.4  
+Requires at least: 6.0  
+Tested up to: 6.5  
 Stable tag: 1.5.0  
 License: GPLv2 or later  
 Requires PHP: 7.2.5
