@@ -9,11 +9,15 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Adds UTM parameters and tracking snippets to Mailster campaigns.
+ *
+ * @since 1.0
  */
 class MailsterGoogleAnalytics {
 
 	/**
 	 * Absolute filesystem path to the plugin directory.
+	 *
+	 * @since 1.0
 	 *
 	 * @var string
 	 */
@@ -22,12 +26,16 @@ class MailsterGoogleAnalytics {
 	/**
 	 * URL to the plugin directory.
 	 *
+	 * @since 1.0
+	 *
 	 * @var string
 	 */
 	private $plugin_url;
 
 	/**
 	 * Hooks activation, loads translations, and registers the init callback.
+	 *
+	 * @since 1.0
 	 *
 	 * @return void
 	 */
@@ -45,6 +53,8 @@ class MailsterGoogleAnalytics {
 
 	/**
 	 * Registers Mailster hooks or shows the missing-Mailster notice.
+	 *
+	 * @since 1.0
 	 *
 	 * @return void
 	 */
@@ -73,6 +83,8 @@ class MailsterGoogleAnalytics {
 
 	/**
 	 * Appends UTM parameters to links when click tracking is off.
+	 *
+	 * @since 1.3
 	 *
 	 * @param string       $content    Campaign HTML.
 	 * @param WP_Post|null $campaign   Campaign post, if available.
@@ -116,6 +128,8 @@ class MailsterGoogleAnalytics {
 	/**
 	 * Adds UTM parameters to a tracked redirect target.
 	 *
+	 * @since 1.0
+	 *
 	 * @param string   $target        Redirect URL.
 	 * @param int      $campaign_id   Campaign ID.
 	 * @param int|bool $subscriber_id Subscriber ID, or false when unknown.
@@ -128,6 +142,8 @@ class MailsterGoogleAnalytics {
 
 	/**
 	 * Maps campaign and subscriber tokens onto a link's UTM query arguments.
+	 *
+	 * @since 1.3
 	 *
 	 * @param string   $link          Destination URL.
 	 * @param int|bool $campaign_id   Campaign ID.
@@ -187,6 +203,8 @@ class MailsterGoogleAnalytics {
 	/**
 	 * Saves campaign-specific UTM values from the newsletter editor.
 	 *
+	 * @since 1.0
+	 *
 	 * @param int     $post_id Post ID.
 	 * @param WP_Post $post    Post object.
 	 * @return void
@@ -219,6 +237,8 @@ class MailsterGoogleAnalytics {
 	/**
 	 * Inserts the Google Analytics section into Mailster settings.
 	 *
+	 * @since 1.0
+	 *
 	 * @param array $settings Settings sections.
 	 * @return array
 	 */
@@ -235,6 +255,8 @@ class MailsterGoogleAnalytics {
 	/**
 	 * Registers the campaign metabox when campaign-based values are enabled.
 	 *
+	 * @since 1.0
+	 *
 	 * @return void
 	 */
 	public function add_meta_boxes() {
@@ -246,6 +268,8 @@ class MailsterGoogleAnalytics {
 
 	/**
 	 * Renders the campaign UTM metabox.
+	 *
+	 * @since 1.0
 	 *
 	 * @return void
 	 */
@@ -276,6 +300,8 @@ class MailsterGoogleAnalytics {
 	/**
 	 * Renders the Google Analytics settings tab.
 	 *
+	 * @since 1.0
+	 *
 	 * @return void
 	 */
 	public function settings() {
@@ -285,6 +311,8 @@ class MailsterGoogleAnalytics {
 
 	/**
 	 * Shows an admin notice when Mailster is not active.
+	 *
+	 * @since 1.0
 	 *
 	 * @return void
 	 */
@@ -308,6 +336,8 @@ class MailsterGoogleAnalytics {
 
 	/**
 	 * Prints legacy and GA4 tracking snippets in the campaign web version footer.
+	 *
+	 * @since 1.0
 	 *
 	 * @return void
 	 */
@@ -360,6 +390,8 @@ class MailsterGoogleAnalytics {
 
 	/**
 	 * Sets default UTM options and reminds the user to enter a property ID.
+	 *
+	 * @since 1.0
 	 *
 	 * @return void
 	 */
