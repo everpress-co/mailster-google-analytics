@@ -1,0 +1,37 @@
+{
+	"name": "mailster-google-analytics",
+	"version": "1.5.0",
+	"description": "Google Analytics tracking integration for Mailster.",
+	"author": "everpress",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"analytics",
+		"google",
+		"mailster",
+		"newsletter",
+		"email"
+	],
+	"homepage": "https://mailster.co",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/everpress-co/mailster-google-analytics.git"
+	},
+	"bugs": {
+		"url": "https://github.com/everpress-co/mailster-google-analytics/issues"
+	},
+	"files": [
+		"*.php",
+		"classes",
+		"views",
+		"readme.txt"
+	],
+	"devDependencies": {
+		"@wordpress/scripts": "^36.1.0"
+	},
+	"scripts": {
+		"lint": "npm run lint:pkg-json",
+		"lint:pkg-json": "wp-scripts lint-pkg-json",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip"
+	}
+}
