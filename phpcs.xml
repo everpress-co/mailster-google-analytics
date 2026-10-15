@@ -5,10 +5,7 @@
 	<config name="testVersion" value="7.4-"/>
 	<config name="minimum_wp_version" value="6.0"/>
 
-	<rule ref="WordPress-Core">
-		<!-- Mailster addons use *.class.php filenames. -->
-		<exclude name="WordPress.Files.FileName"/>
-	</rule>
+	<rule ref="WordPress-Core"/>
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress.WP.I18n"/>
 	<config name="text_domain" value="mailster-google-analytics"/>
@@ -19,15 +16,12 @@
 		</properties>
 	</rule>
 
-	<rule ref="WordPress">
-		<!-- Mailster addons use *.class.php filenames. -->
-		<exclude name="WordPress.Files.FileName"/>
-	</rule>
+	<rule ref="WordPress"/>
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="mailster"/>
-				<element value="mailster_ga"/>
+				<element value="mailster_google_analytics"/>
 			</property>
 		</properties>
 	</rule>
