@@ -3,7 +3,7 @@
 Contributors: everpress, mailster, xaverb  
 Tags: google analytics, newsletter, email, analytics, mailster  
 Requires at least: 6.0  
-Tested up to: 6.5  
+Tested up to: 7.1  
 Stable tag: 1.5.0  
 License: GPLv2 or later  
 Requires PHP: 7.2.5
@@ -94,8 +94,6 @@ The plugin does not export your subscriber list. Two things can still reach Goog
 No. Mailster still records opens and clicks in Mailster. This addon adds Google Analytics campaign parameters, and optionally a tag on the newsletter web version. It does not send form-signup events.
 
 ## Changelog
-
-### Unreleased
 
 ### 1.5.0
 
